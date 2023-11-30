@@ -41,13 +41,29 @@ public class MyController {
 
     @PostMapping(value = "/update")
     public String update(@RequestParam(required = false) String email,
-                         @RequestParam(required = false) String phone) {
+                         @RequestParam(required = false) String phone,
+                         @RequestParam(required = false) String address) {
         User user = getCurrentUser();
 
         String login = user.getUsername();
-        userService.updateUser(login, email, phone);
+        userService.updateUser(login, email, phone, address);
 
         return "redirect:/";
+    }
+
+    @PostMapping(value = "/updateForAdmin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // SpEL !!!
+    public String updateForAdmin(@RequestParam String login,
+                                 @RequestParam(required = false) String email,
+                                 @RequestParam(required = false) String phone,
+                                 @RequestParam(required = false) String address) {
+
+        CustomUser user = userService.findByLogin(login);
+
+        if (user != null){
+            userService.updateUser(login, email, phone, address);
+        }
+        return "redirect:/admin";
     }
 
     @PostMapping(value = "/newuser")
@@ -64,7 +80,6 @@ public class MyController {
             model.addAttribute("login", login);
             return "register";
         }
-
         return "redirect:/";
     }
 
@@ -92,6 +107,18 @@ public class MyController {
     public String admin(Model model) {
         model.addAttribute("users", userService.getAllUsers());
         return "admin";
+    }
+
+    @GetMapping(value = "/update/{login}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // SpEL !!!
+    public String update (@PathVariable(value = "login") String login, Model model) {
+        CustomUser customUser = userService.findByLogin(login);
+        model.addAttribute("login", login);
+        model.addAttribute("email", customUser.getEmail());
+        model.addAttribute("phone", customUser.getPhone());
+        model.addAttribute("address", customUser.getAddress());
+
+        return "updateForAdmin";
     }
 
     @GetMapping("/unauthorized")

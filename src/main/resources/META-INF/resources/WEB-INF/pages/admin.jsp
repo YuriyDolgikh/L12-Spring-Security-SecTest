@@ -11,7 +11,6 @@
 <div align="center">
     <h1>Secret page for admins only!</h1>
     <p>Click to go back: <a href="/">back</a></p>
-
     <p>Click to logout: <a href="/logout">LOGOUT</a></p>
 
     <button type="button" id="add_user">Add</button>
@@ -23,6 +22,7 @@
                 <td><input type="checkbox" name="toDelete" value="${user.id}" id="check_${user.id}"></td>
                 <td><c:out value="${user.login}"/></td>
                 <td><c:out value="${user.role}"/></td>
+                <td><a href="/update/${user.login}">Edit</a></td>
             </tr>
         </c:forEach>
     </table>
